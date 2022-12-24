@@ -24,6 +24,7 @@ HRESULT GetEncoderClsid(const std::wstring& format, GUID* pGuid)
 	std::vector<BYTE> spData;
 	Gdiplus::ImageCodecInfo* pImageCodecInfo = NULL;
 	Gdiplus::Status status;
+
 	bool found = false;
 
 	if (format.empty() || !pGuid)
@@ -150,10 +151,20 @@ int main()
 			// Save the image to a file
 			CLSID bmpClsid;
 			
+			ULONG quality;
+			EncoderParameters encoderParameters;
+			encoderParameters.Count = 1;
+			encoderParameters.Parameter[0].Guid = EncoderQuality;
+			encoderParameters.Parameter[0].Type = EncoderParameterValueTypeLong;
+			encoderParameters.Parameter[0].NumberOfValues = 1;
+			quality = 99;
+			encoderParameters.Parameter[0].Value = &quality;
+
+
 			GetEncoderClsid(L"image/jpeg", &bmpClsid);
 			std::string x = findDocumentFolderAsString() + "\\screenshots\\" + std::to_string(interation_name) + ".jpg";
 			std::wstring wide_string = std::wstring(x.begin(), x.end());
-			image.Save(wide_string.c_str(), &bmpClsid, NULL);
+			image.Save(wide_string.c_str(), &bmpClsid, &encoderParameters);
 			interation_name++;
 			//Clean up
 			try {
